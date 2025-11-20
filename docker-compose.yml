@@ -1,0 +1,131 @@
+version: '3.8'
+
+services:
+
+  # -----------------------------
+  # Redis (Cache, Sessions)
+  # -----------------------------
+  redis:
+    image: redis:latest
+    container_name: sharex_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - sharex-network
+
+  # -----------------------------
+  # PostgreSQL (WRITE DB)
+  # -----------------------------
+  postgres_write:
+    image: postgres:15
+    container_name: sharex_postgres_write
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: sharex
+      POSTGRES_PASSWORD: sharex
+      POSTGRES_DB: sharex_write
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_write_data:/var/lib/postgresql/data
+    networks:
+      - sharex-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sharex -d sharex_write"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # -----------------------------
+  # PostgreSQL (READ DB)
+  # -----------------------------
+  postgres_read:
+    image: postgres:15
+    container_name: sharex_postgres_read
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: sharex
+      POSTGRES_PASSWORD: sharex
+      POSTGRES_DB: sharex_read
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres_read_data:/var/lib/postgresql/data
+    networks:
+      - sharex-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sharex -d sharex_read"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # -----------------------------
+  # Zookeeper (for Kafka)
+  # -----------------------------
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: sharex_zookeeper
+    restart: unless-stopped
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    ports:
+      - "2181:2181"
+    networks:
+      - sharex-network
+
+  # -----------------------------
+  # Kafka (Events)
+  # -----------------------------
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: sharex_kafka
+    restart: unless-stopped
+    ports:
+      - "29092:29092"  # accessible from host
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: |
+        PLAINTEXT://kafka:9092,
+        PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    depends_on:
+      - zookeeper
+    networks:
+      - sharex-network
+
+  # -----------------------------
+  # Kafka UI (Web Console)
+  # -----------------------------
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: sharex_kafka_ui
+    restart: unless-stopped
+    ports:
+      - "18081:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: sharex-local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+    depends_on:
+      - kafka
+    networks:
+      - sharex-network
+
+volumes:
+  redis_data:
+  postgres_write_data:
+  postgres_read_data:
+
+networks:
+  sharex-network:
+    driver: bridge

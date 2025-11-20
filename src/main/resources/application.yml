@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: sharex-app
+
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+
+logging:
+  level:
+    root: INFO

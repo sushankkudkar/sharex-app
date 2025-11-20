@@ -1,0 +1,84 @@
+spring:
+  application:
+    name: sharex-app
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+  kafka:
+    bootstrap-servers: localhost:29092
+    consumer:
+      group-id: sharex-local
+      auto-offset-reset: earliest
+      properties:
+        spring.json.trusted.packages: "com.sharex.*"
+    producer:
+      retries: 3
+      acks: all
+
+  web:
+    cors:
+      allowed-origins: "http://localhost:3000"
+      allowed-methods: "*"
+      allowed-headers: "*"
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+server:
+  port: 8080
+
+logging:
+  level:
+    root: DEBUG
+    org.springframework.web: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+
+# -----------------------------
+# CQRS CONFIG
+# -----------------------------
+cqrs:
+  write-datasource:
+    url: jdbc:postgresql://localhost:5433/sharex_write
+    username: sharex
+    password: sharex
+
+  read-datasource:
+    url: jdbc:postgresql://localhost:5434/sharex_read
+    username: sharex
+    password: sharex
+
+  event-handler:
+    async: true
+
+# -----------------------------
+# READ MODEL STRATEGY
+# -----------------------------
+read-model:
+  update-strategy: event-based
+
+# -----------------------------
+# EVENT BUS CONFIG
+# -----------------------------
+event:
+  bus: in-memory
+
+# -----------------------------
+# CUSTOM APP CONFIG
+# -----------------------------
+custom:
+  environment: local
+  api-owner: "sharex-team"
+  enable-metrics: true

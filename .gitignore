@@ -1,0 +1,87 @@
+### Build ###
+build/
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+### Gradle ###
+.gradle/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### Java ###
+*.class
+*.log
+*.tmp
+hs_err_pid*
+replay_pid*
+
+### Spring Boot ###
+*.original
+.spring-boot-devtools.properties
+
+### IntelliJ IDEA ###
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+### STS ###
+.apt_generated/
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+### VSCode ###
+.vscode/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### Logs ###
+logs/
+*.log
+*.out
+
+### OS (Mac / Linux / Windows) ###
+.DS_Store
+Thumbs.db
+
+### Docker ###
+/docker-data/
+/docker/logs/
+
+### Test ###
+/test-output/
+/reports/
+/jacoco/
+
+### Redis / DB dumps ###
+*.rdb
+*.sql
+*.backup
+
+### Environment Variables ###
+.env
+.env.*
+.env.local
+
+### Annotation processors ###
+generated/
+build/generated/
+
+### Coverage ###
+.coverage
+coverage/
+.idea/libraries/Gradle__org_jacoco*
