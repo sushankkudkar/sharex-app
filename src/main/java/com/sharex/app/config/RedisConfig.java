@@ -1,4 +1,4 @@
-package com.sharex.app.config.redis;
+package com.sharex.app.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

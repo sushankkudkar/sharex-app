@@ -1,4 +1,4 @@
-package com.sharex.app.config.datasource;
+package com.sharex.app.infrastructure.persistence.config;
 
 import com.sharex.app.config.properties.CqrsProperties;
 import lombok.RequiredArgsConstructor;

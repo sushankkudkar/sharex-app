@@ -1,6 +1,8 @@
 spring:
   application:
     name: sharex-app
+  flyway:
+    enabled: false
 
   datasource:
     driver-class-name: org.postgresql.Driver
@@ -37,8 +39,9 @@ server:
 
 logging:
   level:
-    root: DEBUG
-    org.springframework.web: DEBUG
+    root: INFO
+    org.springframework.web: INFO
+    org.hibernate.SQL: DEBUG # only SQL logs (optional)
 
 management:
   endpoints:

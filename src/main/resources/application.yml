@@ -1,6 +1,9 @@
 spring:
   application:
     name: sharex-app
+  spring:
+    jpa:
+      open-in-view: false
 
 management:
   endpoint:
@@ -13,4 +16,4 @@ management:
 
 logging:
   level:
-    root: INFO
+    root: DEBUG
