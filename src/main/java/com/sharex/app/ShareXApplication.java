@@ -9,13 +9,14 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableConfigurationProperties({
         CqrsProperties.class,
-        CustomProperties.class
+        CustomProperties.class,
+        RedisProperties.class
 })
 @EnableScheduling
 public class ShareXApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(ShareXApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(ShareXApplication.class, args);
+    }
 
 }

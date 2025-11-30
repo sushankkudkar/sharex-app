@@ -14,14 +14,16 @@ spring:
 
   kafka:
     bootstrap-servers: localhost:29092
+    producer:
+      acks: all
+      retries: 10
+      enable-idempotence: true
+      transaction-id-prefix: "tx-sharex-"
     consumer:
       group-id: sharex-local
       auto-offset-reset: earliest
       properties:
         spring.json.trusted.packages: "com.sharex.*"
-    producer:
-      retries: 3
-      acks: all
 
   web:
     cors:
@@ -85,3 +87,4 @@ custom:
   environment: local
   api-owner: "sharex-team"
   enable-metrics: true
+  

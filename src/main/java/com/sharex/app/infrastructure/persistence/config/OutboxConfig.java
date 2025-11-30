@@ -1,6 +1,6 @@
 package com.sharex.app.infrastructure.persistence.config;
 
-import com.sharex.app.infrastructure.messaging.outbox.OutboxEventPublisherAdapter;
+import com.sharex.app.infrastructure.messaging.outbox.writer.OutboxEventPublisherAdapter;
 import com.sharex.app.shared.event.EventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,6 +18,6 @@ public class OutboxConfig {
     @Bean
     @Primary
     public EventPublisher eventPublisher() {
-        return adapter;
+        return adapter; // now valid
     }
 }

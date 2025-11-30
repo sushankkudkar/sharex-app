@@ -43,26 +43,31 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-security'
 
-    // --- JPA + Hibernate (Boot 4 / Jakarta 3.1 compatible)
+    // --- JPA + Hibernate (Boot 4 + Jakarta 3.1)
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
     // --- Flyway
     implementation 'org.springframework.boot:spring-boot-starter-flyway'
     implementation 'org.flywaydb:flyway-database-postgresql'
 
-    // --- Redis
-    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    // -------------------------------
+    // 🔥 REDIS (HIGH PERFORMANCE)
+    // Using Redisson for Bloom Filters + Idempotency
+    // -------------------------------
+     implementation 'org.redisson:redisson:3.23.5'
 
-    // --- Kafka
+    // -------------------------------
+    // KAFKA
+    // -------------------------------
     implementation 'org.springframework.boot:spring-boot-starter-kafka'
 
     // -------------------------------
-    // JACKSON (for Instant / LocalDate / LocalDateTime)
+    // JACKSON
     // -------------------------------
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 
     // -------------------------------
-    // JWT (JJWT)
+    // JWT
     // -------------------------------
     implementation "io.jsonwebtoken:jjwt-api:${jjwtVersion}"
     runtimeOnly "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
@@ -96,6 +101,8 @@ dependencies {
     // DEVTOOLS
     // -------------------------------
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    implementation 'io.lettuce:lettuce-core:6.3.0.RELEASE'
+
 
     // -------------------------------
     // TESTING
@@ -116,7 +123,6 @@ tasks.named('asciidoctor') {
     dependsOn test
 }
 
-//
 // =============================================
 //   CUSTOM TEST SOURCE SETS
 // =============================================

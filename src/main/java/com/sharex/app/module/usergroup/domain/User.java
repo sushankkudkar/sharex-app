@@ -1,7 +1,8 @@
 package com.sharex.app.module.usergroup.domain;
 
-import com.sharex.app.shared.event.DomainEvent;
+import com.sharex.app.infrastructure.messaging.outbox.domain.DomainEvent;
 import com.sharex.app.module.usergroup.domain.event.UserCreatedEvent;
+//import com.sharex.app.infrastructure.messaging.outbox.domain.UserCreatedEvent;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -21,24 +22,25 @@ public class User {
         this.name = name;
         this.email = email;
 
-        // Raise domain event with FULL metadata
-        events.add(new UserCreatedEvent(
-                UUID.randomUUID().toString(),      // eventId
-                "user.events.user.created.v1",     // eventType (Kafka topic)
-                1,                                  // eventVersion
-                "1.0.0",                            // schemaVersion
-                userId,                             // aggregate id
+        // Raise domain event
+        raiseEvent(new UserCreatedEvent(
+                UUID.randomUUID().toString(),   // eventId
+                userId,                         // aggregateId
                 name,
                 email,
-                Instant.now()                       // occurredAt
+                Instant.now()                   // occurredAt
         ));
     }
 
-    public String getUserId() { return userId; }
-    public String getName() { return name; }
-    public String getEmail() { return email; }
+    private void raiseEvent(DomainEvent event) {
+        events.add(event);
+    }
 
     public List<DomainEvent> getEvents() {
-        return events;
+        return List.copyOf(events);
     }
+
+    public String getUserId() { return userId; }
+    public String getName()   { return name; }
+    public String getEmail()  { return email; }
 }
