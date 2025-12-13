@@ -16,4 +16,11 @@ management:
 
 logging:
   level:
-    root: DEBUG
+    root: WARN
+    org.hibernate.SQL: OFF
+    org.hibernate.orm.jdbc.bind: OFF
+    org.hibernate.orm.jdbc.extract: OFF
+    org.springframework.web: ERROR
+    org.hibernate.orm.jdbc.error: WARN
+    org.hibernate.engine.jdbc.spi.SqlExceptionHelper: ERROR
+    org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver: ERROR

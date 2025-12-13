@@ -7,10 +7,10 @@
     "eventType":      { "type": "string" },
     "eventVersion":   { "type": "integer" },
     "schemaVersion":  { "type": "string" },
-    "userId":         { "type": "string" },
+    "id":             { "type": "string" },
     "name":           { "type": "string" },
     "email":          { "type": "string", "format": "email" },
     "occurredAt":     { "type": "string", "format": "date-time" }
   },
-  "required": ["eventId","eventType","eventVersion","schemaVersion","userId","name","email","occurredAt"]
+  "required": ["eventId","eventType","eventVersion","schemaVersion","id","name","email","occurredAt"]
 }

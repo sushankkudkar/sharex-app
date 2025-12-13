@@ -18,11 +18,16 @@ public class UserWriteJpaAdapter implements UserWriteRepositoryPort {
     public void save(User user) {
 
         UserWriteEntity e = new UserWriteEntity();
-        e.setId(user.getUserId());
+        e.setId(user.getId());
         e.setName(user.getName());
         e.setEmail(user.getEmail());
 
         repo.save(e);
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return repo.existsByEmail(email);
     }
 }
 

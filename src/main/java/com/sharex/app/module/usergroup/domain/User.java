@@ -2,7 +2,7 @@ package com.sharex.app.module.usergroup.domain;
 
 import com.sharex.app.infrastructure.messaging.outbox.domain.DomainEvent;
 import com.sharex.app.module.usergroup.domain.event.UserCreatedEvent;
-//import com.sharex.app.infrastructure.messaging.outbox.domain.UserCreatedEvent;
+import lombok.Getter;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -11,24 +11,27 @@ import java.util.UUID;
 
 public class User {
 
-    private final String userId;
+    @Getter
+    private final String id;
+    @Getter
     private final String name;
+    @Getter
     private final String email;
 
     private final List<DomainEvent> events = new ArrayList<>();
 
-    public User(String userId, String name, String email) {
-        this.userId = userId;
+    public User(String id, String name, String email) {
+        this.id = id;
         this.name = name;
         this.email = email;
 
         // Raise domain event
         raiseEvent(new UserCreatedEvent(
-                UUID.randomUUID().toString(),   // eventId
-                userId,                         // aggregateId
+                UUID.randomUUID().toString(),
+                id,
                 name,
                 email,
-                Instant.now()                   // occurredAt
+                Instant.now()
         ));
     }
 
@@ -40,7 +43,4 @@ public class User {
         return List.copyOf(events);
     }
 
-    public String getUserId() { return userId; }
-    public String getName()   { return name; }
-    public String getEmail()  { return email; }
 }

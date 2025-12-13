@@ -1,0 +1,17 @@
+package com.sharex.app.shared.web.error;
+
+public enum ErrorCode {
+
+    VALIDATION_ERROR,
+    CONSTRAINT_VIOLATION,
+
+    USER_NOT_FOUND,
+    BUSINESS_RULE_VIOLATION,
+
+    DATABASE_ERROR,
+    KAFKA_ERROR,
+    REDIS_ERROR,
+
+    SERVICE_UNAVAILABLE,
+    INTERNAL_SERVER_ERROR
+}

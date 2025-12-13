@@ -11,8 +11,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Component
 public class OutboxEventDispatcher {
@@ -47,30 +49,32 @@ public class OutboxEventDispatcher {
     @Scheduled(fixedDelayString = "${outbox.dispatcher.delay-ms:500}")
     @Transactional("writeTransactionManager")
     public void dispatch() {
-        List<OutboxRow> rows = jdbc.query(CLAIM_SQL, ps -> ps.setInt(1, batchSize), this::mapRow);
+        List<OutboxRow> rows = jdbc.query(
+                CLAIM_SQL,
+                ps -> ps.setInt(1, batchSize),
+                this::mapRow
+        );
+
         if (rows.isEmpty()) return;
 
         try {
-            // send all messages inside a Kafka transaction
             kafka.executeInTransaction(kt -> {
-                rows.forEach(r -> {
-                    try {
-                        // use outbox id as key for idempotency
-                        kt.send(r.eventType, r.id, r.payload).get();
-                    } catch (Exception e) {
-                        throw new RuntimeException("Kafka send failed", e);
-                    }
-                });
+
+                for (OutboxRow r : rows) {
+                    kt.send(
+                            r.eventType(),   // topic
+                            r.id(),          // key (idempotency)
+                            r.payload()      // value
+                    );
+                }
                 return null;
             });
 
-            // mark published
             markPublished(rows);
-
             log.info("[OUTBOX-DISPATCHER] published batch size={}", rows.size());
 
         } catch (Exception ex) {
-            log.warn("[OUTBOX-DISPATCHER] batch failed, marking attempts. cause={}", ex.getMessage());
+            log.warn("[OUTBOX-DISPATCHER] batch failed, marking attempts", ex);
             markFailed(rows, ex);
         }
     }
@@ -94,7 +98,7 @@ public class OutboxEventDispatcher {
         String sql = "UPDATE outbox_events SET attempts = ?, next_attempt_at = ?, last_error = ? WHERE id = ?";
 
         jdbc.batchUpdate(sql, rows, rows.size(), (ps, r) -> {
-            assert r != null;
+            Objects.requireNonNull(r, "OutboxRow must not be null");
             int next = r.attempts + 1;
             if (next >= maxAttempts) {
                 ps.setInt(1, next);
@@ -103,7 +107,7 @@ public class OutboxEventDispatcher {
             } else {
                 long backoff = Math.min(baseBackoffMillis * (1L << (next - 1)), 30 * 60 * 1000L);
                 ps.setInt(1, next);
-                ps.setObject(2, now.plusNanos(backoff * 1_000_000L));
+                ps.setObject(2, now.plus(Duration.ofMillis(backoff)));
                 ps.setString(3, ex.getMessage());
             }
             ps.setString(4, r.id);

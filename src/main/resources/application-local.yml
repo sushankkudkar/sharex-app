@@ -39,12 +39,6 @@ spring:
 server:
   port: 8080
 
-logging:
-  level:
-    root: INFO
-    org.springframework.web: INFO
-    org.hibernate.SQL: DEBUG # only SQL logs (optional)
-
 management:
   endpoints:
     web:

@@ -1,31 +1,28 @@
 package com.sharex.app.shared.web.advice;
 
-import com.sharex.app.shared.web.dto.ApiError;
-import com.sharex.app.shared.web.dto.ApiResponse;
-import com.sharex.app.shared.web.dto.ValidationError;
-import com.sharex.app.module.usergroup.domain.exception.UserNotFoundException;
+import com.sharex.app.shared.web.dto.*;
+import com.sharex.app.shared.web.error.ErrorCode;
+import com.sharex.app.shared.web.exception.*;
+
 import jakarta.validation.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
-@ControllerAdvice
+@RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // -------------------------
-    // 1) @Valid Validation Errors
-    // -------------------------
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiResponse<?>> handleValidation(MethodArgumentNotValidException ex) {
+    public ResponseEntity<ApiResponse<Void>> handleValidation(MethodArgumentNotValidException ex) {
 
-        List<ValidationError> fieldErrors = ex.getBindingResult()
+        List<ValidationError> errors = ex.getBindingResult()
                 .getFieldErrors()
                 .stream()
                 .map(err -> ValidationError.of(
@@ -34,23 +31,22 @@ public class GlobalExceptionHandler {
                         err.getRejectedValue()
                 ))
                 .sorted(Comparator.comparing(ValidationError::getField))
-                .collect(Collectors.toList());
+                .toList();
 
         ApiError apiError = ApiError.of(
                 "Validation failed",
-                "VALIDATION_ERROR",
-                fieldErrors,
+                ErrorCode.VALIDATION_ERROR.name(),
+                errors,
                 Instant.now()
         );
 
-        return ResponseEntity.badRequest().body(ApiResponse.error(apiError));
+        return ResponseEntity
+                .badRequest()
+                .body(ApiResponse.failure(apiError));
     }
 
-    // -------------------------
-    // 2) For @Validated on path params / query params
-    // -------------------------
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ApiResponse<?>> handleConstraintViolation(ConstraintViolationException ex) {
+    public ResponseEntity<ApiResponse<Void>> handleConstraintViolation(ConstraintViolationException ex) {
 
         List<ValidationError> errors = ex.getConstraintViolations()
                 .stream()
@@ -59,47 +55,77 @@ public class GlobalExceptionHandler {
                         v.getMessage(),
                         v.getInvalidValue()
                 ))
-                .collect(Collectors.toList());
+                .toList();
 
         ApiError apiError = ApiError.of(
                 "Validation failed",
-                "CONSTRAINT_VIOLATION",
+                ErrorCode.CONSTRAINT_VIOLATION.name(),
                 errors,
                 Instant.now()
         );
 
-        return ResponseEntity.badRequest().body(ApiResponse.error(apiError));
+        return ResponseEntity
+                .badRequest()
+                .body(ApiResponse.failure(apiError));
     }
 
-    // -------------------------
-    // 3) Domain / Business Exceptions
-    // -------------------------
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<ApiResponse<?>> handleUserNotFound(UserNotFoundException ex) {
-        ApiError err = ApiError.of(
-                ex.getMessage(),
-                "USER_NOT_FOUND",
-                null,
-                Instant.now()
-        );
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.error(err));
-    }
-
-    // -------------------------
-    // 4) Generic Fallback
-    // -------------------------
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse<?>> handleGeneric(Exception ex) {
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<ApiResponse<Void>> handleBusiness(BusinessException ex) {
 
         ApiError apiError = ApiError.of(
                 ex.getMessage(),
-                "INTERNAL_SERVER_ERROR",
+                ex.getCode().name(),
+                null,
+                Instant.now()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(ApiResponse.failure(apiError));
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handleNotFound(ResourceNotFoundException ex) {
+
+        ApiError apiError = ApiError.of(
+                ex.getMessage(),
+                ex.getCode().name(),
+                null,
+                Instant.now()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(ApiResponse.failure(apiError));
+    }
+
+    @ExceptionHandler(InfrastructureException.class)
+    public ResponseEntity<ApiResponse<Void>> handleInfrastructure(InfrastructureException ex) {
+
+        ApiError apiError = ApiError.of(
+                "Service temporarily unavailable",
+                ex.getCode().name(),
+                null,
+                Instant.now()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(ApiResponse.failure(apiError));
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiResponse<Void>> handleUnknown(Exception ex) {
+
+        ApiError apiError = ApiError.of(
+                "Unexpected system error",
+                ErrorCode.INTERNAL_SERVER_ERROR.name(),
                 null,
                 Instant.now()
         );
 
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ApiResponse.error(apiError));
+                .body(ApiResponse.failure(apiError));
     }
 }

@@ -1,21 +1,22 @@
 package com.sharex.app.module.usergroup.application.command.handler;
 
-import com.sharex.app.infrastructure.messaging.outbox.domain.DomainEvent;
 import com.sharex.app.module.usergroup.application.command.CreateUserCommand;
+import com.sharex.app.module.usergroup.application.dto.UserView;
 import com.sharex.app.module.usergroup.domain.User;
 import com.sharex.app.module.usergroup.port.in.UserCommandPort;
 import com.sharex.app.module.usergroup.port.out.UserWriteRepositoryPort;
 import com.sharex.app.shared.event.EventPublisher;
+import com.sharex.app.shared.web.error.ErrorCode;
+import com.sharex.app.shared.web.exception.BusinessException;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.UUID;
 
 @Service
 public class CreateUserCommandHandler implements UserCommandPort {
 
     private final UserWriteRepositoryPort writeRepo;
-    private final EventPublisher eventPublisher; // now supports batch
+    private final EventPublisher eventPublisher;
 
     public CreateUserCommandHandler(UserWriteRepositoryPort writeRepo,
                                     EventPublisher eventPublisher) {
@@ -24,9 +25,17 @@ public class CreateUserCommandHandler implements UserCommandPort {
     }
 
     @Override
-    public String createUser(CreateUserCommand command) {
+    public UserView createUser(CreateUserCommand command) {
+
+        if (writeRepo.existsByEmail(command.email())) {
+            throw new BusinessException(
+                    "User with this email already exists",
+                    ErrorCode.BUSINESS_RULE_VIOLATION
+            );
+        }
 
         String id = UUID.randomUUID().toString();
+
 
         User user = new User(
                 id,
@@ -34,15 +43,10 @@ public class CreateUserCommandHandler implements UserCommandPort {
                 command.email()
         );
 
-        // Save domain model
         writeRepo.save(user);
 
-        // Collect domain events
-        List<DomainEvent> events = user.getEvents();
+        eventPublisher.publishBatch(user.getEvents());
 
-        // 🚀 Use batch insert for massive performance gain
-        eventPublisher.publishBatch(events);
-
-        return id;
+        return UserView.fromDomain(user);
     }
 }
