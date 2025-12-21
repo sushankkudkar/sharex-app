@@ -46,10 +46,6 @@ dependencies {
     // --- JPA + Hibernate (Boot 4 + Jakarta 3.1)
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
-    // --- Flyway
-    implementation 'org.springframework.boot:spring-boot-starter-flyway'
-    implementation 'org.flywaydb:flyway-database-postgresql'
-
     // -------------------------------
     // 🔥 REDIS (HIGH PERFORMANCE)
     // Using Redisson for Bloom Filters + Idempotency
@@ -102,6 +98,12 @@ dependencies {
     // -------------------------------
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     implementation 'io.lettuce:lettuce-core:6.3.0.RELEASE'
+
+    // -------------------------------
+    // NETTY
+    // -------------------------------
+    runtimeOnly "io.netty:netty-resolver-dns-native-macos:4.1.115.Final:osx-aarch_64"
+
 
 
     // -------------------------------
@@ -170,4 +172,8 @@ tasks.register("integrationTest", Test) {
 // Disable default test task if not needed
 test {
     enabled = false
+}
+
+bootRun {
+    systemProperty "spring.profiles.active", "local"
 }

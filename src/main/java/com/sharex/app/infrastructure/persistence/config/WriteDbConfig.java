@@ -44,8 +44,7 @@ public class WriteDbConfig {
 
         emf.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
         emf.setJpaPropertyMap(Map.of(
-                "hibernate.hbm2ddl.auto", "update",
-                "hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect"
+                "hibernate.hbm2ddl.auto", "validate"
         ));
 
         emf.setPersistenceUnitName("writePU");

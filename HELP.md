@@ -9,7 +9,6 @@ For further reference, please consider the following sections:
 * [Spring Web](https://docs.spring.io/spring-boot/4.0.0-RC2/reference/web/servlet.html)
 * [Validation](https://docs.spring.io/spring-boot/4.0.0-RC2/reference/io/validation.html)
 * [Spring Data JPA](https://docs.spring.io/spring-boot/4.0.0-RC2/reference/data/sql.html#data.sql.jpa-and-spring-data)
-* [Flyway Migration](https://docs.spring.io/spring-boot/4.0.0-RC2/how-to/data-initialization.html#howto.data-initialization.migration-tool.flyway)
 * [Spring Security](https://docs.spring.io/spring-boot/4.0.0-RC2/reference/web/spring-security.html)
 * [Spring Boot Actuator](https://docs.spring.io/spring-boot/4.0.0-RC2/reference/actuator/index.html)
 * [Spring Boot DevTools](https://docs.spring.io/spring-boot/4.0.0-RC2/reference/using/devtools.html)

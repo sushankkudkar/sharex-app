@@ -1,9 +1,10 @@
 spring:
   application:
     name: sharex-app
-  spring:
-    jpa:
-      open-in-view: false
+  devtools:
+    restart:
+      enabled: false
+    add-properties: false
 
 management:
   endpoint:
@@ -16,11 +17,37 @@ management:
 
 logging:
   level:
-    root: WARN
+    root: INFO
+
+    # ---- Spring Boot startup ----
+    org.springframework.boot.StartupInfoLogger: INFO
+
+    # ---- DevTools (silence hints) ----
+    org.springframework.boot.devtools: WARN
+
+    # ---- Spring Data JPA scanning ----
+    org.springframework.data.repository.config: WARN
+
+    # ---- Hibernate lifecycle noise ----
     org.hibernate.SQL: OFF
     org.hibernate.orm.jdbc.bind: OFF
     org.hibernate.orm.jdbc.extract: OFF
-    org.springframework.web: ERROR
-    org.hibernate.orm.jdbc.error: WARN
+    org.hibernate.orm.connections.pooling: ERROR
+    org.hibernate.engine.transaction.internal: ERROR
+    org.hibernate.jpa.internal.util.LogHelper: ERROR
+    org.hibernate.orm.connections.pooling.internal: ERROR
+    org.hibernate.engine.jdbc.env.internal: ERROR
     org.hibernate.engine.jdbc.spi.SqlExceptionHelper: ERROR
-    org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver: ERROR
+
+    # ---- Tomcat / Servlet lifecycle ----
+    org.apache.catalina: ERROR
+    org.apache.coyote: ERROR
+    org.apache.tomcat: ERROR
+    org.springframework.web: ERROR
+
+    # ---- Kafka ----
+    org.apache.kafka: ERROR
+    org.springframework.kafka: ERROR
+
+    # ---- Redis / Redisson ----
+    org.redisson: ERROR
