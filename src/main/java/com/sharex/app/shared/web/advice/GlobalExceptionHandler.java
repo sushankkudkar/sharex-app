@@ -5,7 +5,6 @@ import com.sharex.app.shared.web.error.ErrorCode;
 import com.sharex.app.shared.web.exception.*;
 
 import jakarta.validation.ConstraintViolationException;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
