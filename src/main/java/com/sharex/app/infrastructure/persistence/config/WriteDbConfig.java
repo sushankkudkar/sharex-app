@@ -17,7 +17,7 @@ import java.util.Map;
 @EnableTransactionManagement
 @EnableJpaRepositories(
         basePackages = {
-                "com.sharex.app.module.usergroup.adapter.persistence.write",
+                "com.sharex.app.module.user.adapter.persistence.write",
                 "com.sharex.app.infrastructure.persistence.outbox"
         },
         entityManagerFactoryRef = "writeEntityManagerFactory",
